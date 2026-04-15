@@ -16,9 +16,9 @@ const DEFAULTS = {
   pairs: ['BTCUSDT', 'ETHUSDT'],
   leverage: 5,
   maxPositions: 3,
-  riskPerTrade: 0.02,           // 2% of balance per trade
-  takeProfitPct: 0.03,          // 3% TP
-  stopLossPct: 0.015,           // 1.5% SL
+  riskPerTrade: 0.02,
+  takeProfitPct: 0.03,
+  stopLossPct: 0.015,
   trailingStop: false,
   managementIntervalMin: 10,
   screeningIntervalMin: 30,
@@ -52,12 +52,27 @@ export const BINANCE = {
   },
 };
 
+// FIX: pisahkan API key testnet dan live
+// Jika mode=testnet → pakai BINANCE_TESTNET_API_KEY
+// Jika mode=live    → pakai BINANCE_LIVE_API_KEY
+// Fallback ke BINANCE_API_KEY jika key spesifik tidak ada
 export function getBinanceConfig() {
   const mode = config.mode || 'testnet';
+
+  let apiKey, apiSecret;
+
+  if (mode === 'testnet') {
+    apiKey    = process.env.BINANCE_TESTNET_API_KEY    || process.env.BINANCE_API_KEY    || '';
+    apiSecret = process.env.BINANCE_TESTNET_API_SECRET || process.env.BINANCE_API_SECRET || '';
+  } else {
+    apiKey    = process.env.BINANCE_LIVE_API_KEY    || process.env.BINANCE_API_KEY    || '';
+    apiSecret = process.env.BINANCE_LIVE_API_SECRET || process.env.BINANCE_API_SECRET || '';
+  }
+
   return {
     ...BINANCE[mode],
-    apiKey: process.env.BINANCE_API_KEY || '',
-    apiSecret: process.env.BINANCE_API_SECRET || '',
+    apiKey,
+    apiSecret,
     mode,
   };
 }
